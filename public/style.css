@@ -8,9 +8,11 @@ body {
 
 #app {
     width: 100%;
-    height: 100vh;
+    height: 100%;
     overflow: hidden;
-    display: flex;
+    display: inline-flexbox;
+    margin-left: 1.4%;
+    margin-top: 4%;
     justify-content: center;
     align-items: center;
 }

@@ -31,9 +31,6 @@ export class Game extends Scene
         'D': 'Water',
         'F': 'Wind'
         };
-
-        
-        
         //jerwin change
     }
     
@@ -62,14 +59,14 @@ export class Game extends Scene
         console.log("It's a tie!");
     }
 }
-
     create ()
     {
         this.cameras.main.setBackgroundColor(0x00ff00);
 
         this.add.image(512, 384, 'background').setAlpha(0.5);
         //Creates Goober Sprite
-        const gooberImage = this.add.image(200, 600, 'goober').setInteractive();
+        const gooberImage = this.add.image(780, 100, 'goober').setInteractive();
+        gooberImage.setDisplaySize(150,150);
         //Creates Goober Sound
         const squeak = this.sound.add("squeak");
 
