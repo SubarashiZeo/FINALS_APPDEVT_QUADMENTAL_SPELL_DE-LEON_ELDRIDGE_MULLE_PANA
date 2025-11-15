@@ -48,7 +48,7 @@ export class Game extends Scene
         this.Wind = this.add.image(730, 300, 'Wind').setDepth(100);
         this.Wind.setDisplaySize(350,350);
 
-        //Changes card image position based on keyboard input
+        //Changes card image position based on keyboard input   
         this.input.keyboard.on('keydown-A', event =>
         {
             this.Fire.setY(220);
