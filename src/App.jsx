@@ -48,8 +48,7 @@ const changeScene = () => {
         <div id="app">
             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
 
-            {isMainMenu && (
-                <div style={{ marginTop: "20px" }}>
+            {isMainMenu && (<div style={{ marginTop: "20px" }}>
                     <input
                         type="text"
                         placeholder="Enter your name"
@@ -63,8 +62,7 @@ const changeScene = () => {
                 </div>
             )}
 
-            {isGameOver && (
-                <div style={{ marginTop: "20px" }}>
+            {isGameOver && (<div style={{ marginTop: "20px" }}>
                     <button className="button" onClick={replayGame}>
                         REPLAY
                     </button>
