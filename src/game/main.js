@@ -13,6 +13,11 @@ const config = {
     height: 768,
     parent: 'game-container',
     backgroundColor: '#028af8',
+
+    scale: {
+        mode: Phaser.Scale.FIT,     // Fit inside browser
+        autoCenter: Phaser.Scale.CENTER_BOTH,  // Center horizontally + vertically
+    },
     scene: [
         Boot,
         Preloader,
@@ -20,6 +25,7 @@ const config = {
         Game,
         GameOver
     ]
+    
 };
 
 const StartGame = (parent) => {
