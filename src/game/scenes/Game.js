@@ -7,6 +7,7 @@ export class Game extends Scene
     {
         super('Game');
         //jerwin change
+
         this.min = 1;
         this.max = 4;
         this.arrayLength = 3; // starting array length
@@ -31,6 +32,9 @@ export class Game extends Scene
         'D': 'Water',
         'F': 'Wind'
         };
+
+        this.playerHealth = 3;
+        
         //jerwin change
     }
     
@@ -40,7 +44,6 @@ export class Game extends Scene
         return;
     }
 
-    // Always pick the last enemy card
     const enemyCardObj = this.enemyCards[this.enemyCards.length - 1];
     const enemyCard = enemyCardObj.name;
 
@@ -48,19 +51,86 @@ export class Game extends Scene
     console.log(`Enemy chose: ${enemyCard}`);
 
     if (this.beats[playerCard] === enemyCard) {
-        console.log('Player wins!');
-        // Remove the enemy card from the back
-        enemyCardObj.sprite.destroy();
-        this.enemyCards.pop(); // removes the last element
-    } else if (this.beats[enemyCard] === playerCard) {
-        console.log('Enemy wins!');
-        // Optional: player loses a life or card
-    } else {
-        console.log("It's a tie!");
+    console.log('Player wins!');
+    enemyCardObj.sprite.destroy();
+    this.enemyCards.pop();
+
+    if (this.enemyCards.length === 0) {
+        console.log("Round Complete! Loading next array...");
+        this.loadNextEnemyArray();
+    }
+
+} else {
+    // Wrong OR tie → lose HP
+    console.log("Mistake! Losing 1 HP.");
+
+    this.updateHealth(-1);
+
+    if (this.playerHealth > 0) {
+        console.log("Resetting same cards...");
+        this.resetEnemyCards();
+    }
+}
+}
+
+    resetEnemyCards() {
+    // Remove current sprites
+    this.enemyCards.forEach(obj => obj.sprite.destroy());
+    this.enemyCards = [];
+
+    // Redraw from savedEnemyCards
+    this.savedEnemyCards.forEach((card, index) => {
+        const x = 150 + index * 150;
+        const y = 400;
+        const sprite = this.add.image(x, y, card);
+
+        this.enemyCards.push({ name: card, sprite });
+    });
+    }
+
+    loadNextEnemyArray() {
+    // Generate next array (your function already increases length)
+    const randomNumbers = this.generateRandomIntArray();
+    const cardArray = randomNumbers.map(num => this.cardMap[num]);
+
+    console.log('Next Level Cards:', cardArray);
+
+    // save for future resets
+    this.savedEnemyCards = cardArray.slice();
+
+    // Remove previous sprites
+    this.enemyCards.forEach(obj => obj.sprite.destroy());
+    this.enemyCards = [];
+
+    // Draw new array
+    cardArray.forEach((card, index) => {
+        const x = 150 + index * 150;
+        const y = 400;
+        const sprite = this.add.image(x, y, card);
+        this.enemyCards.push({ name: card, sprite });
+    });
+    }
+
+    updateHealth(amount) {
+    this.playerHealth += amount;
+    this.healthText.setText("Health: " + this.playerHealth);
+
+    if (this.playerHealth <= 0) {
+        console.log("GAME OVER!");
+        this.scene.start("GameOver");  // Or restart the level
     }
 }
     create ()
-    {
+    {   
+        this.playerHealth = 3;
+        this.arrayLength = 3;
+        this.enemyCards = [];
+        this.savedEnemyCards = [];
+
+        this.healthText = this.add.text(20, 20, "Health: 3", {
+        fontSize: "32px",
+        color: "#ffffff"
+        }); //display health
         this.cameras.main.setBackgroundColor(0x00ff00);
 
         this.add.image(512, 384, 'background').setAlpha(0.5);
@@ -163,6 +233,7 @@ export class Game extends Scene
 
         this.enemyCards.push({ name: card, sprite });
         });
+        this.savedEnemyCards = cardArray.slice(); // store a copy
         this.input.keyboard.on('keydown', (event) => {
         const playerCard = this.keyToCard[event.key.toUpperCase()];
         if (playerCard) {
