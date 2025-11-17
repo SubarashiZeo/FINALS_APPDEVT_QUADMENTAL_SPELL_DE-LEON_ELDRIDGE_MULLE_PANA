@@ -8,6 +8,8 @@ export class Game extends Scene
         super('Game');
         //jerwin change
 
+        this.score = 0;
+
         this.min = 1;
         this.max = 4;
         this.arrayLength = 3; // starting array length
@@ -59,6 +61,10 @@ export class Game extends Scene
 
     if (this.enemyCards.length === 0) {
         console.log("Round Complete! Loading next array...");
+
+        this.score += 1000;
+        this.scoreText.setText("Score: " + this.score);
+
         this.loadNextEnemyArray();
     }
 
@@ -126,7 +132,7 @@ export class Game extends Scene
 
     if (this.playerHealth <= 0) {
         console.log("GAME OVER!");
-        this.scene.start("GameOver");  // Or restart the level
+        this.scene.start("GameOver", { finalScore: this.score });
     }
 }
 
@@ -147,6 +153,12 @@ export class Game extends Scene
             fontSize: "32px",
             color: "#ffffff"
         });
+
+        this.scoreText = this.add.text(this.scale.width - 20, 20, "Score: 0", {
+        fontSize: "32px",
+        color: "#ffffff"
+        })
+        .setOrigin(1, 0);
 
         this.cameras.main.setBackgroundColor(0x00ff00);
         this.add.image(512, 384, 'background').setAlpha(0.5);
