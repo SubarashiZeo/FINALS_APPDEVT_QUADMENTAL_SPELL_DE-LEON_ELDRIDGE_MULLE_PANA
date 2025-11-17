@@ -3,90 +3,80 @@ import { useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { PhaserGame } from './PhaserGame';
 
-function App ()
-{
-    // The sprite can only be moved in the MainMenu Scene
-    const [canMoveSprite, setCanMoveSprite] = useState(true);
-    
-    //  References to the PhaserGame component (game and scene are exposed)
+function App() {
     const phaserRef = useRef();
-    const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
 
-    const changeScene = () => {
+    const [playerName, setPlayerName] = useState("");
+    const [isMainMenu, setIsMainMenu] = useState(true); 
+    const [isGameOver, setIsGameOver] = useState(false);
 
-        const scene = phaserRef.current.scene;
-
-        if (scene)
-        {
-            scene.changeScene();
-        }
+const changeScene = () => {
+    if (!playerName.trim()) {
+        alert("Please enter your name!");
+        return;
     }
-
-    const moveSprite = () => {
-
-        const scene = phaserRef.current.scene;
-
-        if (scene && scene.scene.key === 'MainMenu')
-        {
-            // Get the update logo position
-            scene.moveLogo(({ x, y }) => {
-
-                setSpritePosition({ x, y });
-
-            });
-        }
+    const scene = phaserRef.current.scene;
+    
+    if (scene) {
+        scene.scene.start("Game", { playerName }); // pass it here
     }
-
-    const addSprite = () => {
-
-        const scene = phaserRef.current.scene;
-
-        if (scene)
-        {
-            // Add more stars
-            const x = Phaser.Math.Between(64, scene.scale.width - 64);
-            const y = Phaser.Math.Between(64, scene.scale.height - 64);
-
-            //  `add.sprite` is a Phaser GameObjectFactory method and it returns a Sprite Game Object instance
-            const star = scene.add.sprite(x, y, 'star');
-
-            //  ... which you can then act upon. Here we create a Phaser Tween to fade the star sprite in and out.
-            //  You could, of course, do this from within the Phaser Scene code, but this is just an example
-            //  showing that Phaser objects and systems can be acted upon from outside of Phaser itself.
-            scene.add.tween({
-                targets: star,
-                duration: 500 + Math.random() * 1000,
-                alpha: 0,
-                yoyo: true,
-                repeat: -1
-            });
-        }
-    }
-
-    // Event emitted from the PhaserGame component
+};
     const currentScene = (scene) => {
+        const key = scene.scene.key;
 
-        setCanMoveSprite(scene.scene.key !== 'MainMenu');
-        
-    }
+        setIsMainMenu(key === "MainMenu");
+        setIsGameOver(key === "GameOver");
+    };
+    const replayGame = () => {
+        const scene = phaserRef.current.scene;
+        if (scene) {
+            scene.scene.start("Game");
+        }
+    };
+    const returnToMainMenu = () => {
+        const scene = phaserRef.current.scene;
+        if (scene) {
+            scene.scene.start("MainMenu");
+        }
+    };
 
     return (
         <div id="app">
             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
-            <div>
-                {/* <div>
-                    <button disabled={canMoveSprite} className="button" onClick={moveSprite}>Toggle Movement</button>
-                </div> */}
-                {/* <div className="spritePosition">Sprite Position:
-                    <pre>{`{\n  x: ${spritePosition.x}\n  y: ${spritePosition.y}\n}`}</pre>
-                </div> */}
-                {/* <div>
-                    <button className="button" onClick={addSprite}>Add New Sprite</button>
-                </div> */}
-            </div>
-            <button className="button" onClick={changeScene}>Change Scene (This is react)</button>
+
+            {isMainMenu && (<div style={{ marginTop: "20px" }}>
+                    <input
+                        type="text"
+                        placeholder="Enter your name"
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                    />
+
+                    <button className="button" onClick={changeScene}>
+                        START
+                    </button>
+                </div>
+            )}
+
+            {isGameOver && (
+                <div style={{
+                    marginTop: "20px",
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "20px"
+                }}>
+                    <button className="button" onClick={replayGame}>
+                        REPLAY
+                    </button>
+
+                    <button className="button" onClick={returnToMainMenu}>
+                        MAIN MENU
+                    </button>
+                </div>
+)}
         </div>
-    )
+    );
 }
 
-export default App
+export default App;

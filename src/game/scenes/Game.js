@@ -8,6 +8,8 @@ export class Game extends Scene
         super('Game');
         //jerwin change
 
+        this.score = 0;
+
         this.min = 1;
         this.max = 4;
         this.arrayLength = 3; // starting array length
@@ -34,6 +36,8 @@ export class Game extends Scene
         };
 
         this.playerHealth = 3;
+
+        
         
         //jerwin change
     }
@@ -57,6 +61,10 @@ export class Game extends Scene
 
     if (this.enemyCards.length === 0) {
         console.log("Round Complete! Loading next array...");
+
+        this.score += 1000;
+        this.scoreText.setText("Score: " + this.score);
+
         this.loadNextEnemyArray();
     }
 
@@ -71,6 +79,7 @@ export class Game extends Scene
         this.resetEnemyCards();
     }
 }
+
 }
 
     resetEnemyCards() {
@@ -78,12 +87,15 @@ export class Game extends Scene
     this.enemyCards.forEach(obj => obj.sprite.destroy());
     this.enemyCards = [];
 
-    // Redraw from savedEnemyCards
-    this.savedEnemyCards.forEach((card, index) => {
-        const x = 150 + index * 150;
-        const y = 400;
-        const sprite = this.add.image(x, y, card);
+    const GAP = 150;
+    const cardCount = this.savedEnemyCards.length;
+    const totalWidth = (cardCount - 1) * GAP;
+    const startX = this.scale.width / 2 - totalWidth / 2;
+    const y = 400;
 
+    this.savedEnemyCards.forEach((card, index) => {
+        const x = startX + index * GAP;
+        const sprite = this.add.image(x, y, card);
         this.enemyCards.push({ name: card, sprite });
     });
     }
@@ -91,6 +103,10 @@ export class Game extends Scene
     loadNextEnemyArray() {
     // Generate next array (your function already increases length)
     const randomNumbers = this.generateRandomIntArray();
+    const cardCount = cardArray.length;
+    const totalWidth = (cardCount - 1) * GAP;
+    
+    const y = 400; //here
     const cardArray = randomNumbers.map(num => this.cardMap[num]);
 
     console.log('Next Level Cards:', cardArray);
@@ -104,8 +120,7 @@ export class Game extends Scene
 
     // Draw new array
     cardArray.forEach((card, index) => {
-        const x = 150 + index * 150;
-        const y = 400;
+        const x = startX + index * gap;  // <-- use gap here
         const sprite = this.add.image(x, y, card);
         this.enemyCards.push({ name: card, sprite });
     });
@@ -117,129 +132,153 @@ export class Game extends Scene
 
     if (this.playerHealth <= 0) {
         console.log("GAME OVER!");
-        this.scene.start("GameOver");  // Or restart the level
+        this.scene.start("GameOver", { 
+        finalScore: this.score, 
+        playerName: this.playerName});
     }
 }
-    create ()
+
+    create (data)
     {   
+        this.playerName = data.playerName ?? "Anonymous";
+        this.ENEMY_Y = 310;           // top row Y
+        this.ENEMY_CARD_SIZE = 300;   // enemy card size
+        this.ENEMY_ROW_GAP = 50;     // vertical gap between rows
+        this.ENEMY_GAP = 75;         // horizontal gap
+        this.ENEMY_CARDS_PER_ROW = 9; // max card here
+
+        this.score = 0;
         this.playerHealth = 3;
-        this.arrayLength = 3;
+        this.arrayLength = 3; //array lenght here
         this.enemyCards = [];
         this.savedEnemyCards = [];
 
         this.healthText = this.add.text(20, 20, "Health: 3", {
+            fontSize: "32px",
+            color: "#ffffff"
+        });
+
+        this.scoreText = this.add.text(this.scale.width - 20, 20, "Score: 0", {
         fontSize: "32px",
         color: "#ffffff"
-        }); //display health
-        this.cameras.main.setBackgroundColor(0x00ff00);
+        })
+        .setOrigin(1, 0);
 
+        this.cameras.main.setBackgroundColor(0x00ff00);
         this.add.image(512, 384, 'background').setAlpha(0.5);
-        //Creates Goober Sprite
-        const gooberImage = this.add.image(780, 100, 'goober').setInteractive();
-        gooberImage.setDisplaySize(150,150);
-        //Creates Goober Sound
+
+        // --- Goober at top-middle ---
+        const gooberX = this.scale.width / 2;
+        const gooberY = this.scale.height / 6;
+        const gooberImage = this.add.image(gooberX, gooberY, 'goober').setInteractive();
         const squeak = this.sound.add("squeak");
 
-        //This group of Code changes Goober's sprite depending on if I click em or not
-        gooberImage.on('pointerdown',function(pointer)
-        {
-            gooberImage.setTexture('goober_alt');
-            squeak.play();
-        }
-        );
+        gooberImage.on('pointerdown', () => { gooberImage.setTexture('goober_alt'); squeak.play(); });
+        gooberImage.on('pointerup', () => { gooberImage.setTexture('goober'); });
+        gooberImage.on('pointerout', () => { gooberImage.setTexture('goober'); });
 
-        gooberImage.on('pointerout',function(pointer)
-        {
-            gooberImage.setTexture('goober');
-        }
-        );
+        // --- Player Cards ---
+        const PLAYER_CARD_SIZE = 180;
+        const PLAYER_GAP = 220;
+        const PLAYER_Y = 620;
+        const playerButtons = ['Fire', 'Earth', 'Water', 'Wind'];
 
-         gooberImage.on('pointerup',function(pointer)
-        {
-            gooberImage.setTexture('goober');
-        }
-        );
-        
-        //Creates card images
-        this.Fire = this.add.image(220, 300, 'Fire').setDepth(100);
-        this.Fire.setDisplaySize(200,200);
-        this.Earth = this.add.image(350, 300, 'Earth').setDepth(100);
-        this.Earth.setDisplaySize(250,250);
-        this.Water = this.add.image(510, 300, 'Water').setDepth(100);
-        this.Water.setDisplaySize(300,300);
-        this.Wind = this.add.image(730, 300, 'Wind').setDepth(100);
-        this.Wind.setDisplaySize(350,350);
-        
-        this.Fire.setInteractive().on('pointerdown', () => this.handlePlayerChoice('Fire'));
-        this.Earth.setInteractive().on('pointerdown', () => this.handlePlayerChoice('Earth'));
-        this.Water.setInteractive().on('pointerdown', () => this.handlePlayerChoice('Water'));
-        this.Wind.setInteractive().on('pointerdown', () => this.handlePlayerChoice('Wind'));
+        // Calculate centered startX
+        const playerTotalWidth = (playerButtons.length - 1) * PLAYER_GAP;
+        const playerStartX = this.scale.width / 2 - playerTotalWidth / 2;
 
-        //Changes card image position based on keyboard input   
-        this.input.keyboard.on('keydown-A', event =>
-        {
-            this.Fire.setY(220);
-        });
-         this.input.keyboard.on('keyup-A', event =>
-        {
-            this.Fire.setY(320);
+        this.cards = {};
+        playerButtons.forEach((cardName, index) => {
+            const x = playerStartX + index * PLAYER_GAP;
+            const sprite = this.add.image(x, PLAYER_Y, cardName)
+                .setDepth(100)
+                .setDisplaySize(PLAYER_CARD_SIZE, PLAYER_CARD_SIZE);
+            this.cards[cardName] = sprite;
         });
 
-        this.input.keyboard.on('keyup-S', event =>
-        {
-            this.Earth.setY(300);
-        });
-        this.input.keyboard.on('keydown-S', event =>
-        {
-            this.Earth.setY(200);
+        // Keyboard animation
+        this.input.keyboard.on('keydown-A', () => this.cards['Fire'].setY(PLAYER_Y - 50));
+        this.input.keyboard.on('keyup-A', () => this.cards['Fire'].setY(PLAYER_Y));
+        this.input.keyboard.on('keydown-S', () => this.cards['Earth'].setY(PLAYER_Y - 50));
+        this.input.keyboard.on('keyup-S', () => this.cards['Earth'].setY(PLAYER_Y));
+        this.input.keyboard.on('keydown-D', () => this.cards['Water'].setY(PLAYER_Y - 50));
+        this.input.keyboard.on('keyup-D', () => this.cards['Water'].setY(PLAYER_Y));
+        this.input.keyboard.on('keydown-F', () => this.cards['Wind'].setY(PLAYER_Y - 50));
+        this.input.keyboard.on('keyup-F', () => this.cards['Wind'].setY(PLAYER_Y));
+
+        // --- Enemy Cards ---
+        this.generateAndDisplayEnemyCards();
+
+        // Handle keyboard card choice
+        this.input.keyboard.on('keydown', (event) => {
+            const playerCard = this.keyToCard[event.key.toUpperCase()];
+            if (playerCard) this.handlePlayerChoice(playerCard);
         });
 
-        this.input.keyboard.on('keyup-D', event =>
-        {
-            this.Water.setY(300);
-        });
-        this.input.keyboard.on('keydown-D', event =>
-        {
-            this.Water.setY(200);
-        });
-
-        this.input.keyboard.on('keyup-F', event =>
-        {
-            this.Wind.setY(300);
-        });
-        this.input.keyboard.on('keydown-F', event =>
-        {
-            this.Wind.setY(200);
-        });
-        
-        //jerwin change
-        this.enemyCards = [];
-        
         EventBus.emit('current-scene-ready', this);
+    }
 
-        // 1. Generate a random number array
-        const randomNumbers = this.generateRandomIntArray();
+    // --- Helper to generate and display enemy cards centered ---
+    generateAndDisplayEnemyCards() {
+    const randomNumbers = this.generateRandomIntArray();
+    const cardArray = randomNumbers.map(num => this.cardMap[num]);
 
-        // 2. Map numbers to card names
-        const cardArray = randomNumbers.map(num => this.cardMap[num]);
+    this.savedEnemyCards = cardArray.slice();
 
-        console.log('Random numbers:', randomNumbers);
-        console.log('Mapped cards:', cardArray);
+    // Destroy previous sprites
+    this.enemyCards.forEach(obj => obj.sprite.destroy());
+    this.enemyCards = [];
 
-        cardArray.forEach((card, index) => {
-        const x = 150 + index * 150;
-        const y = 400;
+    const canvasWidth = this.cameras.main.width;
+
+    cardArray.forEach((card, index) => {
+        const row = Math.floor(index / this.ENEMY_CARDS_PER_ROW);
+        const col = index % this.ENEMY_CARDS_PER_ROW;
+
+        // center the row
+        const cardsInThisRow = Math.min(this.ENEMY_CARDS_PER_ROW, cardArray.length - row * this.ENEMY_CARDS_PER_ROW);
+        const rowWidth = (cardsInThisRow - 1) * this.ENEMY_GAP;
+        const startX = canvasWidth / 2 - rowWidth / 2;
+
+        const x = startX + col * this.ENEMY_GAP;
+        const y = this.ENEMY_Y + row * this.ENEMY_ROW_GAP;
+
         const sprite = this.add.image(x, y, card);
+        sprite.setDisplaySize(this.ENEMY_CARD_SIZE, this.ENEMY_CARD_SIZE);
 
         this.enemyCards.push({ name: card, sprite });
-        });
-        this.savedEnemyCards = cardArray.slice(); // store a copy
-        this.input.keyboard.on('keydown', (event) => {
-        const playerCard = this.keyToCard[event.key.toUpperCase()];
-        if (playerCard) {
-            this.handlePlayerChoice(playerCard);
-            }
-        });
+    });
+}
+
+// --- Reset enemy cards ---
+        resetEnemyCards() {
+    // Destroy previous sprites
+    this.enemyCards.forEach(obj => obj.sprite.destroy());
+    this.enemyCards = [];
+
+    const canvasWidth = this.cameras.main.width;
+
+    this.savedEnemyCards.forEach((card, index) => {
+        const row = Math.floor(index / this.ENEMY_CARDS_PER_ROW);
+        const col = index % this.ENEMY_CARDS_PER_ROW;
+
+        const cardsInThisRow = Math.min(this.ENEMY_CARDS_PER_ROW, this.savedEnemyCards.length - row * this.ENEMY_CARDS_PER_ROW);
+        const rowWidth = (cardsInThisRow - 1) * this.ENEMY_GAP;
+        const startX = canvasWidth / 2 - rowWidth / 2;
+
+        const x = startX + col * this.ENEMY_GAP;
+        const y = this.ENEMY_Y + row * this.ENEMY_ROW_GAP;
+
+        const sprite = this.add.image(x, y, card);
+        sprite.setDisplaySize(this.ENEMY_CARD_SIZE, this.ENEMY_CARD_SIZE);
+
+        this.enemyCards.push({ name: card, sprite });
+    });
+}
+
+// --- Load next enemy array ---
+loadNextEnemyArray() {
+    this.generateAndDisplayEnemyCards();
         //jerwin change
     }
 
