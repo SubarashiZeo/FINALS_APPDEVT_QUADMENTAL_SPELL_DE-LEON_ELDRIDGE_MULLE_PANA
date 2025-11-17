@@ -132,18 +132,22 @@ export class Game extends Scene
 
     if (this.playerHealth <= 0) {
         console.log("GAME OVER!");
-        this.scene.start("GameOver", { finalScore: this.score });
+        this.scene.start("GameOver", { 
+        finalScore: this.score, 
+        playerName: this.playerName});
     }
 }
 
-    create ()
+    create (data)
     {   
+        this.playerName = data.playerName ?? "Anonymous";
         this.ENEMY_Y = 310;           // top row Y
         this.ENEMY_CARD_SIZE = 300;   // enemy card size
         this.ENEMY_ROW_GAP = 50;     // vertical gap between rows
         this.ENEMY_GAP = 75;         // horizontal gap
         this.ENEMY_CARDS_PER_ROW = 9; // max card here
 
+        this.score = 0;
         this.playerHealth = 3;
         this.arrayLength = 3; //array lenght here
         this.enemyCards = [];
