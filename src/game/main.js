@@ -9,8 +9,8 @@ import { Preloader } from './scenes/Preloader';
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
     type: Phaser.AUTO,
-    width: 1200,
-    height: 950,
+    width: 1040,
+    height: 850,
     parent: 'game-container',
     backgroundColor: '#028af8',
 

@@ -60,7 +60,8 @@ export class Game extends Scene
     console.log('Player wins!');
     enemyCardObj.sprite.destroy();
     this.enemyCards.pop();
-
+    this.Correct.play();
+    
     if (this.enemyCards.length === 0) {
         console.log("Round Complete! Loading next array...");
 
@@ -75,6 +76,7 @@ export class Game extends Scene
     console.log("Mistake! Losing 1 HP.");
 
     this.updateHealth(-1);
+    this.Wrong.play();
 
     if (this.playerHealth > 0) {
         console.log("Resetting same cards...");
@@ -158,6 +160,9 @@ export class Game extends Scene
         this.savedEnemyCards = [];
         this.timedEvent = this.time.delayedCall(10000, this.onTimerFinish, [], this); //timer function
         this.text = this.add.text(582, 32);
+        //SFX 
+        this.Correct = this.sound.add("Correct");
+        this.Wrong = this.sound.add("Wrong");
 
         this.healthText = this.add.text(20, 20, "Health: 3", {
             fontSize: "32px",
@@ -220,7 +225,6 @@ export class Game extends Scene
             const playerCard = this.keyToCard[event.key.toUpperCase()];
             if (playerCard) this.handlePlayerChoice(playerCard);
         });
-
         EventBus.emit('current-scene-ready', this);
     }
 
@@ -286,9 +290,9 @@ export class Game extends Scene
 loadNextEnemyArray() {
     this.roundsCompleted++;
 
-    // Every 3 rounds, increase timer by 1 second, adjust 3 to increase counter
-    const extraSeconds = Math.floor(this.roundsCompleted / 3);
-    this.currentTimerDuration = this.baseTimerDuration + extraSeconds * 1000;
+    // Every 4 rounds, increase timer by 2 second, adjust 4 to increase counter
+    const extraSeconds = Math.floor(this.roundsCompleted / 4);
+    this.currentTimerDuration = this.baseTimerDuration + extraSeconds * 2000;
     this.generateAndDisplayEnemyCards();
 
     this.resetTimer();

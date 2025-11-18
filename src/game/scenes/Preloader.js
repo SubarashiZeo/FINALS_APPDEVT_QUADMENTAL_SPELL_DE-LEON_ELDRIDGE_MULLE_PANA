@@ -42,6 +42,8 @@ export class Preloader extends Scene
         this.load.image('Wind','Wind.png');
 
         this.load.audio('squeak','squeak.mp3');
+        this.load.audio('Correct','Correct.wav')
+        this.load.audio('Wrong','Wrong.wav')
     }
 
     create ()
