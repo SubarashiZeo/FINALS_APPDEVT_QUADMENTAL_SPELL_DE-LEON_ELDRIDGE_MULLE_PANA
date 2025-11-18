@@ -12,6 +12,8 @@ function App() {
     // NEW: React states for score and health
     const [score, setScore] = useState(0);
     const [health, setHealth] = useState(3);
+    const [prevHealth, setPrevHealth] = useState(3);
+    const [damageFade, setDamageFade] = useState(false);
 
     // Poll Phaser scene for score/health values
     useEffect(() => {
@@ -25,6 +27,22 @@ function App() {
 
         return () => clearInterval(interval);
     }, []);
+    
+    //Health Fade Effect
+    useEffect(() => {
+    if (health < prevHealth) {
+        setDamageFade(true);
+
+        // remove the fade after animation finishes
+        setTimeout(() => setDamageFade(false), 300);
+
+        // update stored previous health
+        setPrevHealth(health);
+    } else if (health > prevHealth) {
+        // health increased (heal)
+        setPrevHealth(health);
+    }
+}, [health]);
 
     const changeScene = () => {
         if (!playerName.trim()) {
@@ -92,25 +110,23 @@ function App() {
             zIndex: 1000
         }}>
             <div>Score: {score}</div>
-            <div style={{ display: 'flex', gap: '5px' }}>
-                {(() => {
-                    let heart = '❤️';
-                    if (health === 3) heart = '💚';
-                    else if (health === 2) heart = '💙';
-                    else if (health === 1) heart = '❤️';
-
-                    return Array.from({ length: health }).map((_, i) => (
-                        <span key={i} style={{ fontSize: '24px' }}>{heart}</span>
-                    ));
-                })()}
-            </div>
+    <div style={{ display: 'flex', gap: '5px' }}>
+    {Array.from({ length: health }).map((_, i) => (
+        <span
+            key={i}
+            className={damageFade ? "heart-fade" : ""}
+            style={{ fontSize: '24px' }}
+        >
+            {health === 3 ? '💚' : health === 2 ? '💙' : '❤️'}
+        </span>
+    ))}
+</div>
         </div>
     </>
 )}
 
-
             {isMainMenu && (
-                <div style={{ marginTop: "20px" }}>
+                  <div id="mainmenu">
                     <input
                         type="text"
                         placeholder="Enter your name"
@@ -124,13 +140,7 @@ function App() {
             )}
 
             {isGameOver && (
-                <div style={{
-                    marginTop: "20px",
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "20px"
-                }}>
+                 <div id="gameover">
                     <button className="button" onClick={replayGame}>
                         REPLAY
                     </button>
