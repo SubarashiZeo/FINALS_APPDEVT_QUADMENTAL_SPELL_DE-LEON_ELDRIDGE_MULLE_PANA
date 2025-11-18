@@ -2,7 +2,10 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 
 export class Game extends Scene
-{
+{   
+    timedEvent;
+    text;
+    timertext;     
     constructor ()
     {
         super('Game');
@@ -36,9 +39,8 @@ export class Game extends Scene
         };
 
         this.playerHealth = 3;
-
-        
-        
+        this.roundsCompleted = 0; // new
+        this.baseTimerDuration = 10000; // 10 seconds in ms
         //jerwin change
     }
     
@@ -81,7 +83,6 @@ export class Game extends Scene
 }
 
 }
-
     resetEnemyCards() {
     // Remove current sprites
     this.enemyCards.forEach(obj => obj.sprite.destroy());
@@ -118,6 +119,9 @@ export class Game extends Scene
     this.enemyCards.forEach(obj => obj.sprite.destroy());
     this.enemyCards = [];
 
+    this.generateAndDisplayEnemyCards();
+    this.resetTimer();
+
     // Draw new array
     cardArray.forEach((card, index) => {
         const x = startX + index * gap;  // <-- use gap here
@@ -152,6 +156,8 @@ export class Game extends Scene
         this.arrayLength = 3; //array lenght here
         this.enemyCards = [];
         this.savedEnemyCards = [];
+        this.timedEvent = this.time.delayedCall(10000, this.onTimerFinish, [], this); //timer function
+        this.text = this.add.text(582, 32);
 
         this.healthText = this.add.text(20, 20, "Health: 3", {
             fontSize: "32px",
@@ -278,8 +284,14 @@ export class Game extends Scene
 
 // --- Load next enemy array ---
 loadNextEnemyArray() {
+    this.roundsCompleted++;
+
+    // Every 3 rounds, increase timer by 1 second, adjust 3 to increase counter
+    const extraSeconds = Math.floor(this.roundsCompleted / 3);
+    this.currentTimerDuration = this.baseTimerDuration + extraSeconds * 1000;
     this.generateAndDisplayEnemyCards();
-        //jerwin change
+
+    this.resetTimer();
     }
 
     //jerwin changes start
@@ -298,5 +310,28 @@ loadNextEnemyArray() {
     changeScene ()
     {
         this.scene.start('GameOver');
+    }
+
+    onTimerFinish() {
+    this.scene.start("GameOver", { 
+        finalScore: this.score, 
+        playerName: this.playerName
+    });
+}
+
+    resetTimer() {
+    // stop old timer if present
+    if (this.timedEvent) {
+        this.timedEvent.remove(false);
+    }
+
+    this.timedEvent = this.time.delayedCall(this.currentTimerDuration, this.onTimerFinish, [], this);
+    }
+
+    //Timer update
+    update ()
+    {
+        const remainingSecond = Math.floor(this.timedEvent.getRemaining() / 1000);
+        this.text.setText(`Timer: ${remainingSecond.toString().substr(0, 4)}`);
     }
 }
