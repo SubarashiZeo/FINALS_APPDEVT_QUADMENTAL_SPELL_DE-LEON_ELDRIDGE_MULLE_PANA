@@ -118,6 +118,9 @@ export class Game extends Scene
     this.enemyCards.forEach(obj => obj.sprite.destroy());
     this.enemyCards = [];
 
+    this.generateAndDisplayEnemyCards();
+    this.resetTimer();
+
     // Draw new array
     cardArray.forEach((card, index) => {
         const x = startX + index * gap;  // <-- use gap here
@@ -152,7 +155,7 @@ export class Game extends Scene
         this.arrayLength = 3; //array lenght here
         this.enemyCards = [];
         this.savedEnemyCards = [];
-        this.timedEvent = this.time.delayedCall(16000, this.onEvent, [], this); //timer function
+        this.timedEvent = this.time.delayedCall(10000, this.onTimerFinish, [], this); //timer function
         this.text = this.add.text(582, 32);
 
         this.healthText = this.add.text(20, 20, "Health: 3", {
@@ -281,7 +284,8 @@ export class Game extends Scene
 // --- Load next enemy array ---
 loadNextEnemyArray() {
     this.generateAndDisplayEnemyCards();
-        //jerwin change
+
+    this.resetTimer();
     }
 
     //jerwin changes start
@@ -300,6 +304,23 @@ loadNextEnemyArray() {
     changeScene ()
     {
         this.scene.start('GameOver');
+    }
+
+    onTimerFinish() {
+    this.scene.start("GameOver", { 
+        finalScore: this.score, 
+        playerName: this.playerName
+    });
+}
+
+    resetTimer() {
+    // stop old timer if present
+    if (this.timedEvent) {
+        this.timedEvent.remove(false);
+    }
+
+    // start a new 10s timer that calls onTimerFinish when done
+    this.timedEvent = this.time.delayedCall(10000, this.onTimerFinish, [], this);
     }
 
     //Timer update
