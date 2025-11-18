@@ -39,6 +39,8 @@ export class Game extends Scene
         };
 
         this.playerHealth = 3;
+        this.roundsCompleted = 0; // new
+        this.baseTimerDuration = 10000; // 10 seconds in ms
         //jerwin change
     }
     
@@ -283,6 +285,11 @@ export class Game extends Scene
 
 // --- Load next enemy array ---
 loadNextEnemyArray() {
+    this.roundsCompleted++;
+
+    // Every 3 rounds, increase timer by 1 second, adjust 3 to increase counter
+    const extraSeconds = Math.floor(this.roundsCompleted / 3);
+    this.currentTimerDuration = this.baseTimerDuration + extraSeconds * 1000;
     this.generateAndDisplayEnemyCards();
 
     this.resetTimer();
@@ -319,8 +326,7 @@ loadNextEnemyArray() {
         this.timedEvent.remove(false);
     }
 
-    // start a new 10s timer that calls onTimerFinish when done
-    this.timedEvent = this.time.delayedCall(10000, this.onTimerFinish, [], this);
+    this.timedEvent = this.time.delayedCall(this.currentTimerDuration, this.onTimerFinish, [], this);
     }
 
     //Timer update
