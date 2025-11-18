@@ -2,7 +2,10 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 
 export class Game extends Scene
-{
+{   
+    timedEvent;
+    text;
+    timertext;     
     constructor ()
     {
         super('Game');
@@ -36,9 +39,6 @@ export class Game extends Scene
         };
 
         this.playerHealth = 3;
-
-        
-        
         //jerwin change
     }
     
@@ -152,6 +152,8 @@ export class Game extends Scene
         this.arrayLength = 3; //array lenght here
         this.enemyCards = [];
         this.savedEnemyCards = [];
+        this.timedEvent = this.time.delayedCall(16000, this.onEvent, [], this); //timer function
+        this.text = this.add.text(582, 32);
 
         this.healthText = this.add.text(20, 20, "Health: 3", {
             fontSize: "32px",
@@ -298,5 +300,13 @@ loadNextEnemyArray() {
     changeScene ()
     {
         this.scene.start('GameOver');
+    }
+
+    //Timer update
+    update ()
+    {
+        const remainingTime = this.timedEvent.getRemaining();
+        const remainingSecond = Math.floor(remainingTime / 1000);
+        this.text.setText(`Timer: ${remainingSecond.toString().substr(0, 4)}`);
     }
 }
