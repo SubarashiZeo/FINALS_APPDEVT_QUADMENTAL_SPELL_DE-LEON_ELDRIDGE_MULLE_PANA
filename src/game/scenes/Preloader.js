@@ -44,6 +44,7 @@ export class Preloader extends Scene
         this.load.audio('squeak','squeak.mp3');
         this.load.audio('Correct','Correct.wav')
         this.load.audio('Wrong','Wrong.wav')
+        this.load.audio('BGM','BGM.wav')
     }
 
     create ()
@@ -52,6 +53,8 @@ export class Preloader extends Scene
         //  For example, you can define global animations here, so we can use them in other scenes.
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
+        const BGM = this.sound.add('BGM', { loop: true, volume: 0.1 });
+        BGM.play();
         this.scene.start('MainMenu');
     }
 }
