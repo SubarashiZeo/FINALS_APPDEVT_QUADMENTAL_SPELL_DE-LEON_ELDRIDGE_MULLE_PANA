@@ -83,7 +83,6 @@ export class Game extends Scene
 }
 
 }
-
     resetEnemyCards() {
     // Remove current sprites
     this.enemyCards.forEach(obj => obj.sprite.destroy());
@@ -332,8 +331,7 @@ loadNextEnemyArray() {
     //Timer update
     update ()
     {
-        const remainingTime = this.timedEvent.getRemaining();
-        const remainingSecond = Math.floor(remainingTime / 1000);
+        const remainingSecond = Math.floor(this.timedEvent.getRemaining() / 1000);
         this.text.setText(`Timer: ${remainingSecond.toString().substr(0, 4)}`);
     }
 }
