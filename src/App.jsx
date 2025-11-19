@@ -150,7 +150,7 @@ function App() {
                         placeholder="Enter your name"
                         value={playerName}
                         onChange={(e) => setPlayerName(e.target.value)}
-                        maxLength="6"
+                        maxLength="10"
                     />
                     <button className="button" onClick={changeScene}>
                         START
