@@ -9,40 +9,48 @@ function App() {
     const [isMainMenu, setIsMainMenu] = useState(true); 
     const [isGameOver, setIsGameOver] = useState(false);
 
-    // NEW: React states for score and health
+    // NEW: React states for score, health, and timer
     const [score, setScore] = useState(0);
     const [health, setHealth] = useState(3);
     const [prevHealth, setPrevHealth] = useState(3);
     const [damageFade, setDamageFade] = useState(false);
+    const [timer, setTimer] = useState(0);
+    const [maxTimer, setMaxTimer] = useState(10); // store max duration in seconds
 
-    // Poll Phaser scene for score/health values
+    // Poll Phaser scene for score/health/timer values
     useEffect(() => {
         const interval = setInterval(() => {
             const scene = phaserRef.current?.scene;
             if (scene && scene.score !== undefined && scene.playerHealth !== undefined) {
                 setScore(scene.score);
                 setHealth(scene.playerHealth);
+
+                // Timer polling
+                if (scene.timedEvent) {
+                    const remainingSeconds = Math.floor(scene.timedEvent.getRemaining() / 1000);
+                    setTimer(remainingSeconds);
+
+                    // capture max duration once (in seconds)
+                    if (scene.currentTimerDuration) {
+                        setMaxTimer(Math.floor(scene.currentTimerDuration / 1000));
+                    }
+                }
             }
-        }, 500); // check every half second
+        }, 500);
 
         return () => clearInterval(interval);
     }, []);
     
     //Health Fade Effect
     useEffect(() => {
-    if (health < prevHealth) {
-        setDamageFade(true);
-
-        // remove the fade after animation finishes
-        setTimeout(() => setDamageFade(false), 300);
-
-        // update stored previous health
-        setPrevHealth(health);
-    } else if (health > prevHealth) {
-        // health increased (heal)
-        setPrevHealth(health);
-    }
-}, [health]);
+        if (health < prevHealth) {
+            setDamageFade(true);
+            setTimeout(() => setDamageFade(false), 300);
+            setPrevHealth(health);
+        } else if (health > prevHealth) {
+            setPrevHealth(health);
+        }
+    }, [health]);
 
     const changeScene = () => {
         if (!playerName.trim()) {
@@ -75,58 +83,98 @@ function App() {
         }
     };
 
+    // Calculate bar width percentage
+    const timerPercent = maxTimer > 0 ? (timer / maxTimer) * 100 : 0;
+
     return (
         <div id="app">
+            {/* Inline font definition so no external CSS needed */}
+            <style>
+                {`
+                @font-face {
+                    font-family: 'HappyKids';
+                    src: url('/assets/Happy Kids.ttf') format('truetype');
+                    font-weight: normal;
+                    font-style: normal;
+                }
+                `}
+            </style>
+
             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
 
             {/* Score & Health UI (only visible during gameplay) */}
-        {!isMainMenu && !isGameOver && (
-    <>
-        {/* Player Name (top-left corner) */}
-        <div style={{
-            position: 'absolute',
-            top: 20,
-            left: 20,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            padding: '10px 20px',
-            borderRadius: '10px',
-            color: 'white',
-            fontSize: '20px',
-            zIndex: 1000
-        }}>
-            <div>{playerName}</div>
-        </div>
+            {!isMainMenu && !isGameOver && (
+                <>
+                    {/* Player Name (top-left corner) */}
+                    <div style={{
+                        position: 'absolute',
+                        top: 20,
+                        left: 20,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        padding: '10px 20px',
+                        borderRadius: '10px',
+                        color: 'white',
+                        fontSize: '32px',
+                        fontWeight: 'bold',
+                        fontFamily: 'HappyKids, sans-serif', // custom font
+                        zIndex: 1000
+                    }}>
+                        <div>{playerName}</div>
+                    </div>
 
-        {/* Score & Health (top-right corner) */}
-        <div style={{
-            position: 'absolute',
-            top: 20,
-            right: 20,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            padding: '10px 20px',
-            borderRadius: '10px',
-            color: 'white',
-            fontSize: '20px',
-            zIndex: 1000
-        }}>
-            <div>Score: {score}</div>
-    <div style={{ display: 'flex', gap: '5px' }}>
-    {Array.from({ length: health }).map((_, i) => (
-        <span
-            key={i}
-            className={damageFade ? "heart-fade" : ""}
-            style={{ fontSize: '24px' }}
-        >
-            {health === 3 ? '💚' : health === 2 ? '💙' : '❤️'}
-        </span>
-    ))}
-</div>
-        </div>
-    </>
-)}
+                    {/* Score & Health (top-right corner) */}
+                    <div style={{
+                        position: 'absolute',
+                        top: 20,
+                        right: 20,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        padding: '10px 20px',
+                        borderRadius: '10px',
+                        color: 'white',
+                        fontSize: '32px',
+                        fontWeight: 'bold',
+                        fontFamily: 'HappyKids, sans-serif', // custom font
+                        zIndex: 1000
+                    }}>
+                        <div>Score: {score}</div>
+                        <div style={{ display: 'flex', gap: '5px' }}>
+                            {Array.from({ length: health }).map((_, i) => (
+                                <span
+                                    key={i}
+                                    className={damageFade ? "heart-fade" : ""}
+                                    style={{ fontSize: '28px' }}
+                                >
+                                    {health === 3 ? '💚' : health === 2 ? '💙' : '❤️'}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Timer Bar (bottom-center) */}
+                    <div style={{
+                        position: 'absolute',
+                        bottom: 20,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '500px',
+                        height: '30px',
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        zIndex: 1000
+                    }}>
+                        <div style={{
+                            width: `${timerPercent}%`,
+                            height: '100%',
+                            backgroundColor: timer <= 5 ? 'red' : 'dodgerblue',
+                            transition: 'width 0.5s linear'
+                        }} />
+                    </div>
+                </>
+            )}
 
             {isMainMenu && (
-                  <div id="mainmenu">
+                <div id="mainmenu">
                     <input
                         type="text"
                         placeholder="Enter your name"
@@ -140,7 +188,7 @@ function App() {
             )}
 
             {isGameOver && (
-                 <div id="gameover">
+                <div id="gameover">
                     <button className="button" onClick={replayGame}>
                         REPLAY
                     </button>
