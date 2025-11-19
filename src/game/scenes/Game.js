@@ -9,7 +9,6 @@ export class Game extends Scene
     constructor ()
     {
         super('Game');
-        //jerwin change
 
         this.score = 0;
 
@@ -41,7 +40,6 @@ export class Game extends Scene
         this.playerHealth = 3;
         this.roundsCompleted = 0; // new
         this.baseTimerDuration = 10000; // 10 seconds in ms
-        //jerwin change
     }
     
     handlePlayerChoice(playerCard) {
@@ -62,6 +60,7 @@ export class Game extends Scene
     this.StarParticle.explode(30, enemyCardObj.sprite.x, enemyCardObj.sprite.y);
     enemyCardObj.sprite.destroy();
     this.enemyCards.pop();
+    this.highlightNextEnemyCard();
     this.Correct.play();
     
     if (this.enemyCards.length === 0) {
@@ -82,57 +81,42 @@ export class Game extends Scene
 
     if (this.playerHealth > 0) {
         console.log("Resetting same cards...");
-        this.resetEnemyCards();
+        this.resetEnemyCards(); 
     }
 }
 
 }
     resetEnemyCards() {
-    // Remove current sprites
+    // Destroy previous sprites
     this.enemyCards.forEach(obj => obj.sprite.destroy());
     this.enemyCards = [];
 
-    const GAP = 150;
-    const cardCount = this.savedEnemyCards.length;
-    const totalWidth = (cardCount - 1) * GAP;
-    const startX = this.scale.width / 2 - totalWidth / 2;
-    const y = 400;
+    const canvasWidth = this.cameras.main.width;
 
     this.savedEnemyCards.forEach((card, index) => {
-        const x = startX + index * GAP;
+        const row = Math.floor(index / this.ENEMY_CARDS_PER_ROW);
+        const col = index % this.ENEMY_CARDS_PER_ROW;
+
+        const cardsInThisRow = Math.min(
+            this.ENEMY_CARDS_PER_ROW,
+            this.savedEnemyCards.length - row * this.ENEMY_CARDS_PER_ROW
+        );
+        const rowWidth = (cardsInThisRow - 1) * this.ENEMY_GAP;
+        const startX = canvasWidth / 2 - rowWidth / 2;
+
+        const x = startX + col * this.ENEMY_GAP;
+        const y = this.ENEMY_Y + row * this.ENEMY_ROW_GAP;
+
         const sprite = this.add.image(x, y, card);
+        sprite.setScale(this.ENEMY_CARD_SCALE);
+
+        // Add sprite to enemyCards array
         this.enemyCards.push({ name: card, sprite });
     });
-    }
 
-    loadNextEnemyArray() {
-    // Generate next array (your function already increases length)
-    const randomNumbers = this.generateRandomIntArray();
-    const cardCount = cardArray.length;
-    const totalWidth = (cardCount - 1) * GAP;
-    
-    const y = 400; //here
-    const cardArray = randomNumbers.map(num => this.cardMap[num]);
-
-    console.log('Next Level Cards:', cardArray);
-
-    // save for future resets
-    this.savedEnemyCards = cardArray.slice();
-
-    // Remove previous sprites
-    this.enemyCards.forEach(obj => obj.sprite.destroy());
-    this.enemyCards = [];
-
-    this.generateAndDisplayEnemyCards();
-    this.resetTimer();
-
-    // Draw new array
-    cardArray.forEach((card, index) => {
-        const x = startX + index * gap;  // <-- use gap here
-        const sprite = this.add.image(x, y, card);
-        this.enemyCards.push({ name: card, sprite });
-    });
-    }
+    // Highlight last card
+    this.highlightNextEnemyCard();
+}
 
     updateHealth(amount) {
     this.playerHealth += amount;
@@ -146,11 +130,36 @@ export class Game extends Scene
     }
 }
 
+    highlightNextEnemyCard() {
+    if (!this.enemyCards || this.enemyCards.length === 0) return;
+
+    const normalScale = this.ENEMY_CARD_SCALE;
+    const highlightScale = normalScale * 1.1; // 10% bigger
+    const dimTint = 0xAAAAAA; // grayish tint for non-highlighted cards
+    const normalTint = 0xffffff; // full color for highlighted card
+
+    // Reset all cards to normal scale
+    this.enemyCards.forEach((obj, index) => {
+        if (index === this.enemyCards.length - 1) {
+            // Last card -> highlight
+            obj.sprite.setScale(highlightScale);
+            obj.sprite.setTint(normalTint);
+        } else {
+            // Other cards -> slightly darker
+            obj.sprite.setScale(normalScale);
+            obj.sprite.setTint(dimTint);
+        }
+    });
+
+    // Make the last card bigger
+    const lastCardObj = this.enemyCards[this.enemyCards.length - 1];
+    lastCardObj.sprite.setScale(highlightScale);
+}
+
     create (data)
     {   
         this.playerName = data.playerName ?? "Anonymous";
-        this.ENEMY_Y = 310;           // top row Y
-        this.ENEMY_CARD_SIZE = 300;   // enemy card size
+        this.ENEMY_Y = 425;           // top row Y
         this.ENEMY_ROW_GAP = 50;     // vertical gap between rows
         this.ENEMY_GAP = 75;         // horizontal gap
         this.ENEMY_CARDS_PER_ROW = 9; // max card here
@@ -165,6 +174,8 @@ export class Game extends Scene
         //SFX 
         this.Correct = this.sound.add("Correct");
         this.Wrong = this.sound.add("Wrong");
+
+        this.ENEMY_CARD_SCALE = 0.34;
 
         this.healthText = this.add.text(20, 20, "Health: 3", {
             fontSize: "32px",
@@ -209,9 +220,9 @@ export class Game extends Scene
         gooberImage.on('pointerout', () => { gooberImage.setTexture('goober'); });
 
         // --- Player Cards ---
-        const PLAYER_CARD_SIZE = 180;
+        const PLAYER_CARD_SCALE = 0.30;
         const PLAYER_GAP = 220;
-        const PLAYER_Y = 620;
+        const PLAYER_Y = 800;
         const playerButtons = ['Fire', 'Earth', 'Water', 'Fauna'];
 
         // Calculate centered startX
@@ -223,9 +234,23 @@ export class Game extends Scene
             const x = playerStartX + index * PLAYER_GAP;
             const sprite = this.add.image(x, PLAYER_Y, cardName)
                 .setDepth(100)
-                .setDisplaySize(PLAYER_CARD_SIZE, PLAYER_CARD_SIZE);
+                .setScale(PLAYER_CARD_SCALE)
+                .setInteractive();     // <-- enables clicking
             this.cards[cardName] = sprite;
+
+            sprite.on("pointerdown", () => {
+        sprite.setY(PLAYER_Y - 50);   // raise card like keyboard
+        this.handlePlayerChoice(cardName);
         });
+
+        sprite.on("pointerup", () => {
+            sprite.setY(PLAYER_Y);        // put card back down
+        });
+
+        sprite.on("pointerout", () => {
+            sprite.setY(PLAYER_Y);        // ensure card returns if pointer leaves
+        });
+    });
 
         // Keyboard animation
         this.input.keyboard.on('keydown-A', () => this.cards['Fire'].setY(PLAYER_Y - 50));
@@ -274,10 +299,18 @@ export class Game extends Scene
         const y = this.ENEMY_Y + row * this.ENEMY_ROW_GAP;
 
         const sprite = this.add.image(x, y, card);
-        sprite.setDisplaySize(this.ENEMY_CARD_SIZE, this.ENEMY_CARD_SIZE);
+        sprite.setScale(this.ENEMY_CARD_SCALE);
+
+        if (index === this.savedEnemyCards.length - 1) {
+        sprite.setScale(this.ENEMY_CARD_SCALE * 1.1); // 20% bigger
+        } 
+        else {
+            sprite.setScale(this.ENEMY_CARD_SCALE);
+        }
 
         this.enemyCards.push({ name: card, sprite });
     });
+    this.highlightNextEnemyCard();
 }
 
 // --- Reset enemy cards ---
@@ -292,7 +325,10 @@ export class Game extends Scene
         const row = Math.floor(index / this.ENEMY_CARDS_PER_ROW);
         const col = index % this.ENEMY_CARDS_PER_ROW;
 
-        const cardsInThisRow = Math.min(this.ENEMY_CARDS_PER_ROW, this.savedEnemyCards.length - row * this.ENEMY_CARDS_PER_ROW);
+        const cardsInThisRow = Math.min(
+            this.ENEMY_CARDS_PER_ROW,
+            this.savedEnemyCards.length - row * this.ENEMY_CARDS_PER_ROW
+        );
         const rowWidth = (cardsInThisRow - 1) * this.ENEMY_GAP;
         const startX = canvasWidth / 2 - rowWidth / 2;
 
@@ -300,10 +336,14 @@ export class Game extends Scene
         const y = this.ENEMY_Y + row * this.ENEMY_ROW_GAP;
 
         const sprite = this.add.image(x, y, card);
-        sprite.setDisplaySize(this.ENEMY_CARD_SIZE, this.ENEMY_CARD_SIZE);
+        sprite.setScale(this.ENEMY_CARD_SCALE);
 
+        // Add sprite to enemyCards array
         this.enemyCards.push({ name: card, sprite });
     });
+
+    // Correctly highlight the last card
+    this.highlightNextEnemyCard();
 }
 
 // --- Load next enemy array ---
@@ -318,7 +358,6 @@ loadNextEnemyArray() {
     this.resetTimer();
     }
 
-    //jerwin changes start
     generateRandomIntArray() {
         const result = Array.from({ length: this.arrayLength }, () =>
         Math.floor(Math.random() * (this.max - this.min + 1)) + this.min
@@ -330,7 +369,6 @@ loadNextEnemyArray() {
         return result;
     }
     
-    //jerwin changes end
     changeScene ()
     {
         this.scene.start('GameOver');

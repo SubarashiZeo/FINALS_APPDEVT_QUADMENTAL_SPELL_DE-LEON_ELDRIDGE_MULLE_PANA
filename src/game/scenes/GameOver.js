@@ -21,7 +21,7 @@ export class GameOver extends Scene {
         saveScore(playerName, score);
 
         // --- Game Over Text ---
-        const gameOverText = this.add.text(centerX, centerY - 200, 'GAME OVER', {
+        const gameOverText = this.add.text(centerX, centerY - 400, 'GAME OVER', {
             fontFamily: 'Arial Black',
             fontSize: 64,
             color: '#ffffff',
@@ -30,7 +30,7 @@ export class GameOver extends Scene {
             align: 'center'
         }).setOrigin(0.5);
 
-        this.add.text(centerX, centerY - 120, `Your Score: ${score}`, {
+        this.add.text(centerX, centerY - 310, `Your Score: ${score}`, {
             fontFamily: 'Arial',
             fontSize: 48,
             color: '#ffffff'
@@ -38,14 +38,14 @@ export class GameOver extends Scene {
 
         // --- Leaderboard ---
         const leaderboard = getLeaderboard();
-        this.add.text(centerX, centerY - 20, 'Leaderboard', {
+        this.add.text(centerX, centerY - 210, 'Leaderboard', {
             fontFamily: 'Arial Black',
             fontSize: 40,
             color: '#ffff00'
         }).setOrigin(0.5);
 
         leaderboard.forEach((entry, index) => {
-            this.add.text(centerX, centerY + 40 + index * 40, `${index + 1}. ${entry.name} - ${entry.score}`, {
+            this.add.text(centerX, centerY - 160 + index * 40, `${index + 1}. ${entry.name} - ${entry.score}`, {
                 fontFamily: 'Arial',
                 fontSize: 32,
                 color: '#ffffff'
