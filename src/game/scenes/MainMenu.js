@@ -15,13 +15,13 @@ export class MainMenu extends Scene
         this.add.image(961, 540, 'bgmenu').setScale(1.1);
         this.add.image(961, 540, 'stars');
         this.add.image(611, 150, 'title');
-            
-         this.add.text(958, 585, 'Rules', {
+        this.add.image(955, 550, 'circle').setScale(1.5);
+         this.add.text(958, 550, 'Rules', {
             fontFamily: 'Arial Black', fontSize: 69, color: '#66ff6bff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setDepth(100).setOrigin(0.5);
-        this.add.image(950, 575, 'wheel').setScale(0.55).setDepth(10);
+        this.add.image(950, 542, 'wheel').setScale(0.5).setDepth(10);
         
         EventBus.emit('current-scene-ready', this);
     }
