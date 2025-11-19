@@ -169,10 +169,11 @@ html, body {
     position: absolute;
     top: 20px;
     right: 20px;
-    background-color: rgba(0,0,0,0.5);
+     background-color: rgb(255, 216, 44);
     padding: 10px 20px;
+    border: 10px solid #a409d8de;
     border-radius: 10px;
-    color: white;
+    color: rgb(0, 0, 0);
     font-size: 32px;
     z-index: 1000;
 }
