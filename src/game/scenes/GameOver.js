@@ -12,7 +12,7 @@ export class GameOver extends Scene {
         const centerX = this.cameras.main.width / 2;
         const centerY = this.cameras.main.height / 2;
 
-        this.add.image(961, 540, 'bgmenu');
+        this.add.image(961, 540, 'bgmenu').setScale(1.1);
 
         const score = data.finalScore ?? 0;
         const playerName = data.playerName ?? "Anonymous";

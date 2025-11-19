@@ -366,12 +366,12 @@ export class Game extends Scene
 loadNextEnemyArray() {
     this.roundsCompleted++;
 
-    // Every 4 rounds, increase timer by 2 second, adjust 4 to increase counter
-    const extraSeconds = Math.floor(this.roundsCompleted / 4);
-    this.currentTimerDuration = this.baseTimerDuration + extraSeconds * 2000;
+    // Every 3 rounds, increase timer by 3 seconds, adjust 3 to increase counter
+    const extraSeconds = Math.floor(this.roundsCompleted / 3);
+    this.currentTimerDuration = this.baseTimerDuration + extraSeconds * 3000;
     this.generateAndDisplayEnemyCards();
 
-    this.resetTimer();
+    this.resetTimer();  
     }
 
     generateRandomIntArray() {

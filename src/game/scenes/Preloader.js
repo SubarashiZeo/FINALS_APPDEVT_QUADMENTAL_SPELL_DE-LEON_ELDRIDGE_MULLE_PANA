@@ -10,7 +10,7 @@ export class Preloader extends Scene
     init ()
     {
         //  We loaded this image in our Boot Scene, so we can display it here
-        this.add.image(961, 540, 'bgmenu');
+        this.add.image(961, 540, 'bgmenu').setScale(1.1);
         //  A simple progress bar. This is the outline of the bar.
         this.add.rectangle(952, 584, 498, 32).setStrokeStyle(1, 0xffffff);
 
