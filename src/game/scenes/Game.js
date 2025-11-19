@@ -238,7 +238,14 @@ export class Game extends Scene
                 .setInteractive();     // <-- enables clicking
             this.cards[cardName] = sprite;
 
-            sprite.on("pointerdown", () => {
+        const mouseIcon = this.add.image(
+        x - sprite.displayWidth / 2 + 10, // offset a little right from left edge
+        PLAYER_Y - sprite.displayHeight / 2 + 10, // offset a little down from top edge
+        'mouse')
+        .setScale(0.13) // scale down to fit nicely
+        .setDepth(120); // above the card
+
+        sprite.on("pointerdown", () => {
         sprite.setY(PLAYER_Y - 50);   // raise card like keyboard
         this.handlePlayerChoice(cardName);
         });
@@ -250,7 +257,16 @@ export class Game extends Scene
         sprite.on("pointerout", () => {
             sprite.setY(PLAYER_Y);        // ensure card returns if pointer leaves
         });
+        
     });
+
+        const KEY_Y_OFFSET = 130; // distance below player cards
+        const keyImages = ['a_key', 's_key', 'd_key', 'f_key'];
+        keyImages.forEach((keyImg, index) => {
+            const x = playerStartX + index * PLAYER_GAP;
+            const y = PLAYER_Y + KEY_Y_OFFSET;
+            this.add.image(x, y, keyImg).setScale(0.4).setDepth(110); // depth below cards
+        });
 
         // Keyboard animation
         this.input.keyboard.on('keydown-A', () => this.cards['Fire'].setY(PLAYER_Y - 50));

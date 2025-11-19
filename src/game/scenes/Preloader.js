@@ -46,6 +46,12 @@ export class Preloader extends Scene
         this.load.image('Fauna','Fauna.png');
         this.load.image('Poof','Poof.png');
         this.load.image('StarParticle','StarParticle.png');
+        this.load.image('a_key', 'a_key.png');
+        this.load.image('s_key', 's_key.png');
+        this.load.image('d_key', 'd_key.png');
+        this.load.image('f_key', 'f_key.png');
+        this.load.image('mouse', 'mouse.png');
+
         //Audio
         this.load.audio('squeak','squeak.mp3');
         this.load.audio('Correct','Correct.wav')
