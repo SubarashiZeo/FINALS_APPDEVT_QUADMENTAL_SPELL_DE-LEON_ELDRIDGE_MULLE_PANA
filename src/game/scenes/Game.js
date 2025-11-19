@@ -58,6 +58,8 @@ export class Game extends Scene
 
     if (this.beats[playerCard] === enemyCard) {
     console.log('Player wins!');
+    this.Poof.emitParticleAt(enemyCardObj.sprite.x, enemyCardObj.sprite.y);
+    this.StarParticle.explode(30, enemyCardObj.sprite.x, enemyCardObj.sprite.y);
     enemyCardObj.sprite.destroy();
     this.enemyCards.pop();
     this.Correct.play();
@@ -177,6 +179,25 @@ export class Game extends Scene
 
         this.cameras.main.setBackgroundColor(0x00ff00);
         this.add.image(512, 384, 'background').setAlpha(0.5);
+
+        //particles
+        this.Poof = this.add.particles(0, 0, 'Poof', {
+            speed: 100,
+            lifespan: 500,
+            quantity: 5,
+            frequency: -1, 
+            scale: { start: 0.15, end: 0 }
+        });
+        this.Poof.setDepth(20);
+
+        this.StarParticle = this.add.particles(0, 0, 'StarParticle', {
+            speed: 1000,
+            lifespan: 500,
+            quantity: 50,
+            frequency: -1, 
+            scale: { start: 0.6, end: 0 }
+        });                
+        this.StarParticle.setDepth(10);
 
         // --- Goober at top-middle ---
         const gooberX = this.scale.width / 2;

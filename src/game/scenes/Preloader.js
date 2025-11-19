@@ -40,6 +40,8 @@ export class Preloader extends Scene
         this.load.image('Earth','Earth.png');
         this.load.image('Water','Water.png');
         this.load.image('Wind','Wind.png');
+        this.load.image('Poof','Poof.png');
+        this.load.image('StarParticle','StarParticle.png');
 
         this.load.audio('squeak','squeak.mp3');
         this.load.audio('Correct','Correct.wav')
