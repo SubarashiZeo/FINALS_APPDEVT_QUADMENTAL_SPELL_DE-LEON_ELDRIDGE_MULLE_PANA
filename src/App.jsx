@@ -15,8 +15,9 @@ function App() {
     const [health, setHealth] = useState(3);
     const [prevHealth, setPrevHealth] = useState(3);
     const [damageFade, setDamageFade] = useState(false);
-    const [timer, setTimer] = useState(0);
     const [maxTimer, setMaxTimer] = useState(10); // store max duration in seconds
+    const [timer, setTimer] = useState(maxTimer); // start full bar
+    const [hasStarted, setHasStarted] = useState(false); // track first update
 
     // Poll Phaser scene for score/health/timer values
     useEffect(() => {
@@ -35,12 +36,14 @@ function App() {
                     if (scene.currentTimerDuration) {
                         setMaxTimer(Math.floor(scene.currentTimerDuration / 1000));
                     }
+
+                    if (!hasStarted) setHasStarted(true);
                 }
             }
         }, 500);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [hasStarted]);
     
     //Health Fade Effect
     useEffect(() => {
@@ -54,11 +57,10 @@ function App() {
     }, [health]);
 
     useEffect(() => {
-    if (isGameOver) {
-        saveScore(playerName, score);
-    }
-}, [isGameOver]);
-
+        if (isGameOver) {
+            saveScore(playerName, score);
+        }
+    }, [isGameOver]);
 
     const changeScene = () => {
         if (!playerName.trim()) {
@@ -68,6 +70,8 @@ function App() {
         const scene = phaserRef.current.scene;
         if (scene) {
             scene.scene.start("Game", { playerName });
+            setTimer(maxTimer);       // reset bar to full
+            setHasStarted(false);     // reset transition state
         }
     };
 
@@ -81,6 +85,8 @@ function App() {
         const scene = phaserRef.current.scene;
         if (scene) {
             scene.scene.start("Game");
+            setTimer(maxTimer);       // reset bar to full
+            setHasStarted(false);     // reset transition state
         }
     };
 
@@ -88,6 +94,8 @@ function App() {
         const scene = phaserRef.current.scene;
         if (scene) {
             scene.scene.start("MainMenu");
+            setTimer(maxTimer);       // reset bar to full
+            setHasStarted(false);     // reset transition state
         }
     };
 
@@ -128,16 +136,15 @@ function App() {
                                 </span>
                             ))}
                         </div>
-                        </div>
+                    </div>
             
-
                     {/* Timer Bar (bottom-center) */}
-                        <div className="timer-bar-container">
+                    <div className="timer-bar-container">
                         <div style={{
                             width: `${timerPercent}%`,
                             height: '100%',
                             backgroundColor: timer <= 5 ? 'red' : 'dodgerblue',
-                            transition: 'width 0.5s linear'
+                            transition: hasStarted ? 'width 0.5s linear' : 'none'
                         }} />
                     </div>
                 </>
