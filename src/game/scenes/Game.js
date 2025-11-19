@@ -37,7 +37,7 @@ export class Game extends Scene
         'F': 'Fauna'
         };
 
-        this.playerHealth = 3;
+        this.playerHealth = 5;
         this.roundsCompleted = 0; // new
         this.baseTimerDuration = 10000; // 10 seconds in ms
     }
@@ -165,7 +165,7 @@ export class Game extends Scene
         this.ENEMY_CARDS_PER_ROW = 9; // max card here
 
         this.score = 0;
-        this.playerHealth = 3;
+        this.playerHealth = 5;
         this.arrayLength = 3; //array lenght here
         this.enemyCards = [];
         this.savedEnemyCards = [];
