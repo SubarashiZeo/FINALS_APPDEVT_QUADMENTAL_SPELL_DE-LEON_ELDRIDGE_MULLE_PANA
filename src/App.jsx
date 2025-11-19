@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import Phaser from 'phaser';
 import { PhaserGame } from './PhaserGame';
+import { getLeaderboard, saveScore } from './game/scenes/leaderboard';
 
 function App() {
     const phaserRef = useRef();
@@ -51,6 +52,13 @@ function App() {
             setPrevHealth(health);
         }
     }, [health]);
+
+    useEffect(() => {
+    if (isGameOver) {
+        saveScore(playerName, score);
+    }
+}, [isGameOver]);
+
 
     const changeScene = () => {
         if (!playerName.trim()) {
