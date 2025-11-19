@@ -3,7 +3,6 @@ import { Scene } from 'phaser';
 
 export class MainMenu extends Scene
 {
-    logoTween;
 
     constructor ()
     {
@@ -12,62 +11,23 @@ export class MainMenu extends Scene
 
     create ()
     {
-        this.add.image(512, 384, 'background');
-
-        this.logo = this.add.image(512, 200, 'logo').setDepth(100);
-        this.goober = this.add.image(512, 400, 'goober').setDepth(100);
-
-        this.add.text(512, 550, 'This is Phaser', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#66ff6bff',
+        this.goober = this.add.image(1550, 750, 'goober_new').setDepth(100);
+        this.add.image(961, 540, 'bgmenu');
+        this.add.image(961, 540, 'stars');
+        this.add.image(611, 150, 'title');
+        this.add.image(958, 585, 'circle').setScale(1.8);
+         this.add.text(958, 585, 'Rules', {
+            fontFamily: 'Arial Black', fontSize: 69, color: '#66ff6bff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
         }).setDepth(100).setOrigin(0.5);
+        this.add.image(950, 575, 'wheel').setScale(0.55).setDepth(10);
         
         EventBus.emit('current-scene-ready', this);
     }
 
     changeScene ()
     {
-        if (this.logoTween)
-        {
-            this.logoTween.stop();
-            this.logoTween = null;
-        }
-
         this.scene.start('Game'); 
-    }
-
-    moveLogo (reactCallback)
-    {
-        if (this.logoTween)
-        {
-            if (this.logoTween.isPlaying())
-            {
-                this.logoTween.pause();
-            }
-            else
-            {
-                this.logoTween.play();
-            }
-        }
-        else
-        {
-            this.logoTween = this.tweens.add({
-                targets: this.logo,
-                x: { value: 750, duration: 3000, ease: 'Back.easeInOut' },
-                y: { value: 80, duration: 1500, ease: 'Sine.easeOut' },
-                yoyo: true,
-                repeat: -1,
-                onUpdate: () => {
-                    if (reactCallback)
-                    {
-                        reactCallback({
-                            x: Math.floor(this.logo.x),
-                            y: Math.floor(this.logo.y)
-                        });
-                    }
-                }
-            });
-        }
     }
 }
