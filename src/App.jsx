@@ -124,7 +124,7 @@ function App() {
                                     className={damageFade ? "heart-fade" : ""}
                                     style={{ fontSize: '28px' }}
                                 >
-                                    {health === 3 ? '💚' : health === 2 ? '💙' : '❤️'}
+                                    {health === 5 ? '💚' : health === 2 ? '💙' : '❤️'}
                                 </span>
                             ))}
                         </div>
