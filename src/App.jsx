@@ -91,11 +91,7 @@ function App() {
             {/* Inline font definition so no external CSS needed */}
             <style>
                 {`
-                @font-face {
-                    font-family: 'HappyKids';
-                    src: url('/assets/Happy Kids.ttf') format('truetype');
-                    font-weight: normal;
-                    font-style: normal;
+
                 }
                 `}
             </style>
@@ -106,36 +102,12 @@ function App() {
             {!isMainMenu && !isGameOver && (
                 <>
                     {/* Player Name (top-left corner) */}
-                    <div style={{
-                        position: 'absolute',
-                        top: 20,
-                        left: 20,
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        padding: '10px 20px',
-                        borderRadius: '10px',
-                        color: 'white',
-                        fontSize: '32px',
-                        fontWeight: 'bold',
-                        fontFamily: 'HappyKids, sans-serif', // custom font
-                        zIndex: 1000
-                    }}>
+                    <div className="player-name-box">
                         <div>{playerName}</div>
                     </div>
 
                     {/* Score & Health (top-right corner) */}
-                    <div style={{
-                        position: 'absolute',
-                        top: 20,
-                        right: 20,
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        padding: '10px 20px',
-                        borderRadius: '10px',
-                        color: 'white',
-                        fontSize: '32px',
-                        fontWeight: 'bold',
-                        fontFamily: 'HappyKids, sans-serif', // custom font
-                        zIndex: 1000
-                    }}>
+                    <div className="score-health-box">
                         <div>Score: {score}</div>
                         <div style={{ display: 'flex', gap: '5px' }}>
                             {Array.from({ length: health }).map((_, i) => (
@@ -148,21 +120,11 @@ function App() {
                                 </span>
                             ))}
                         </div>
-                    </div>
+                        </div>
+            
 
                     {/* Timer Bar (bottom-center) */}
-                    <div style={{
-                        position: 'absolute',
-                        bottom: 20,
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '500px',
-                        height: '30px',
-                        backgroundColor: 'rgba(255,255,255,0.2)',
-                        borderRadius: '10px',
-                        overflow: 'hidden',
-                        zIndex: 1000
-                    }}>
+                        <div className="timer-bar-container">
                         <div style={{
                             width: `${timerPercent}%`,
                             height: '100%',
@@ -180,6 +142,7 @@ function App() {
                         placeholder="Enter your name"
                         value={playerName}
                         onChange={(e) => setPlayerName(e.target.value)}
+                        maxLength="6"
                     />
                     <button className="button" onClick={changeScene}>
                         START
