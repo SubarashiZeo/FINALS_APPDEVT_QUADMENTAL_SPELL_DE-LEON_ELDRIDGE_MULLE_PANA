@@ -21,13 +21,13 @@ export class Game extends Scene
         1: 'Fire',
         2: 'Earth',
         3: 'Water',
-        4: 'Wind'
+        4: 'Fauna'
         };
 
         this.beats = {
         'Water': 'Fire',
-        'Fire': 'Wind',
-        'Wind': 'Earth',
+        'Fire': 'Fauna',
+        'Fauna': 'Earth',
         'Earth': 'Water'
         }
 
@@ -35,7 +35,7 @@ export class Game extends Scene
         'A': 'Fire',
         'S': 'Earth',
         'D': 'Water',
-        'F': 'Wind'
+        'F': 'Fauna'
         };
 
         this.playerHealth = 3;
@@ -177,8 +177,7 @@ export class Game extends Scene
         })
         .setOrigin(1, 0);
 
-        this.cameras.main.setBackgroundColor(0x00ff00);
-        this.add.image(961, 540, 'bgmenu');
+        this.add.image(961, 540, 'gameBG').setScale(0.559);
 
         //particles
         this.Poof = this.add.particles(0, 0, 'Poof', {
@@ -213,7 +212,7 @@ export class Game extends Scene
         const PLAYER_CARD_SIZE = 180;
         const PLAYER_GAP = 220;
         const PLAYER_Y = 620;
-        const playerButtons = ['Fire', 'Earth', 'Water', 'Wind'];
+        const playerButtons = ['Fire', 'Earth', 'Water', 'Fauna'];
 
         // Calculate centered startX
         const playerTotalWidth = (playerButtons.length - 1) * PLAYER_GAP;
@@ -235,8 +234,8 @@ export class Game extends Scene
         this.input.keyboard.on('keyup-S', () => this.cards['Earth'].setY(PLAYER_Y));
         this.input.keyboard.on('keydown-D', () => this.cards['Water'].setY(PLAYER_Y - 50));
         this.input.keyboard.on('keyup-D', () => this.cards['Water'].setY(PLAYER_Y));
-        this.input.keyboard.on('keydown-F', () => this.cards['Wind'].setY(PLAYER_Y - 50));
-        this.input.keyboard.on('keyup-F', () => this.cards['Wind'].setY(PLAYER_Y));
+        this.input.keyboard.on('keydown-F', () => this.cards['Fauna'].setY(PLAYER_Y - 50));
+        this.input.keyboard.on('keyup-F', () => this.cards['Fauna'].setY(PLAYER_Y));
 
         // --- Enemy Cards ---
         this.generateAndDisplayEnemyCards();

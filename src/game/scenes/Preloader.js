@@ -30,8 +30,9 @@ export class Preloader extends Scene
     {
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
-
+        //Images
         this.load.image('bgmenu', 'bgmenu.png');
+        this.load.image('gameBG', 'gameBG.png');
         this.load.image('title', 'title.png');
         this.load.image('stars', 'stars.png');
         this.load.image('goober', 'goober.png');
@@ -42,10 +43,10 @@ export class Preloader extends Scene
         this.load.image('Fire','Fire.png');
         this.load.image('Earth','Earth.png');
         this.load.image('Water','Water.png');
-        this.load.image('Wind','Wind.png');
+        this.load.image('Fauna','Fauna.png');
         this.load.image('Poof','Poof.png');
         this.load.image('StarParticle','StarParticle.png');
-
+        //Audio
         this.load.audio('squeak','squeak.mp3');
         this.load.audio('Correct','Correct.wav')
         this.load.audio('Wrong','Wrong.wav')
